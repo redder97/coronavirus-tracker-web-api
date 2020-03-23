@@ -57,6 +57,10 @@ public class ScrapedData {
         this.criticalCondition = criticalCondition;
     }
 
+    public void infect(int mockInfection){
+        this.globalCases = globalCases;
+    }
+
     @Override
     public String toString() {
         return "ScrapedData{" +

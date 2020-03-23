@@ -4,7 +4,9 @@ import com.vtracker.covidtracker.domain.ScrapedData;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -18,14 +20,18 @@ import java.util.logging.Logger;
 @Service
 public class ScraperServiceImpl implements ScraperService {
 
+    @Autowired
+    SimpMessagingTemplate simpMessagingTemplate;
+
     private final static Logger LOGGER = Logger.getLogger(ScraperServiceImpl.class.getName());
     private static final String COVID_TRACKER_URL = "https://www.worldometers.info/coronavirus/";
+
 
     private static ScrapedData scrapedData;
 
     @Override
     @PostConstruct
-    @Scheduled(fixedRate = 120000)
+    @Scheduled(fixedRate = 1200000)
     public void scrape() throws IOException {
         LOGGER.info("SCRAPING");
         ScrapedData scrapedDataGenerated = new ScrapedData();
@@ -52,6 +58,7 @@ public class ScraperServiceImpl implements ScraperService {
 
         scrapedData = scrapedDataGenerated;
         LOGGER.info("Scrape: " + scrapedData);
+        this.simpMessagingTemplate.convertAndSend("/socket-publisher", scrapedData);
     }
 
     @Bean
