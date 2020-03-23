@@ -5,6 +5,7 @@ import com.vtracker.covidtracker.domain.ProvincialCase;
 import com.vtracker.covidtracker.domain.VirusGeoData;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -21,8 +22,15 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
+
+/*
+* Main class for compiling information related to COVID-19
+* */
 @Service
 public class VirusDataServiceImpl implements VirusDataService{
+
+    @Autowired
+    ScraperService scraperService;
 
     private static final String CONFIRMED_CASES_URL = "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Confirmed.csv";
     private static final String DEATHS_URL =  "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Deaths.csv";
@@ -35,7 +43,12 @@ public class VirusDataServiceImpl implements VirusDataService{
     @Override
     @PostConstruct
     @Scheduled(cron = "* 1 * * * *")
-    public void fetchAsyncConfirmedCases() throws ExecutionException, InterruptedException, IOException {
+    public void initData() throws ExecutionException, InterruptedException, IOException {
+        fetchAsyncConfirmedCases();
+    }
+
+
+    private void fetchAsyncConfirmedCases() throws ExecutionException, InterruptedException, IOException {
         System.out.println("LIST RETRIEVAL");
         List<VirusGeoData> virusGeoData = new ArrayList<>();
         List<ProvincialCase> provincialCases = new ArrayList<>();
@@ -125,12 +138,8 @@ public class VirusDataServiceImpl implements VirusDataService{
             return geoData;
         }).collect(Collectors.toList());
 
-        virusGeoData.stream().forEach(s -> {
-            System.out.println(s);
-        });
-
         allProvincialCases = provincialCases;
-        setComposedData(virusGeoData, provincialCases);
+        setComposedData(provincialCases);
         confirmedVirusData = virusGeoData;
     }
 
@@ -146,16 +155,8 @@ public class VirusDataServiceImpl implements VirusDataService{
         return composedData;
     }
 
-    private void setComposedData(List<VirusGeoData> virusGeoData, List<ProvincialCase> provincialCases){
+    private void setComposedData(List<ProvincialCase> provincialCases) throws IOException {
         ComposedData composedDataGenerated = new ComposedData();
-
-        int globalCases = virusGeoData.stream().mapToInt(VirusGeoData::getTotalConfirmedCases).sum();
-        int globalRecoveries = virusGeoData.stream().mapToInt(VirusGeoData::getTotalRecoveries).sum();
-        int globalDeaths = virusGeoData.stream().mapToInt(VirusGeoData::getTotalDeaths).sum();
-
-        composedDataGenerated.setGlobalCases(globalCases);
-        composedDataGenerated.setGlobalDeaths(globalDeaths);
-        composedDataGenerated.setGlobalRecoveries(globalRecoveries);
 
         List<ProvincialCase> topByDeath = provincialCases.stream()
                 .sorted(Comparator.comparingInt(ProvincialCase::getDeaths).reversed()).collect(Collectors.toList());
@@ -170,9 +171,9 @@ public class VirusDataServiceImpl implements VirusDataService{
         composedDataGenerated.setTopByConfirmedCases(topByConfirmedCases.subList(0,10));
         composedDataGenerated.setTopByRecoveries(topByRecoveries.subList(0,10));
 
-
         composedData = composedDataGenerated;
     }
+
 
 
 

@@ -1,6 +1,7 @@
 package com.vtracker.covidtracker.controller;
 
 import com.vtracker.covidtracker.domain.ComposedData;
+import com.vtracker.covidtracker.domain.ScrapedData;
 import com.vtracker.covidtracker.domain.VirusGeoData;
 import com.vtracker.covidtracker.service.VirusDataService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,9 @@ public class Controller {
     List<VirusGeoData> confirmedCases;
 
     @Autowired
+    ScrapedData scrapedData;
+
+    @Autowired
     ComposedData composedData;
 
     private static String URL = "https://github.com/CSSEGISandData/COVID-19/blob/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Confirmed.csv";
@@ -33,4 +37,7 @@ public class Controller {
 
     @GetMapping(value ="/composed-cases", produces = MediaType.APPLICATION_JSON_VALUE)
     public ComposedData getComposedData() { return composedData; }
+
+    @GetMapping(value="/scraped-data", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ScrapedData getScrapedData() { return scrapedData; }
 }
