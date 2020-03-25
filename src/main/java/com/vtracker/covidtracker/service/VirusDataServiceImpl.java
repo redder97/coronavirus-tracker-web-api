@@ -95,7 +95,6 @@ public class VirusDataServiceImpl implements VirusDataService{
             String longitude = r.get("Long");
             String latitude = r.get("Lat");
             int confirmedCases = Integer.parseInt(r.get(r.size() - 1));
-
             ProvincialCase p = new ProvincialCase(country, region, longitude, latitude);
             p.setConfirmedCases(confirmedCases);
             provincialCases.add(p);
