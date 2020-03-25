@@ -20,6 +20,8 @@ import java.net.http.HttpResponse;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 
@@ -28,6 +30,8 @@ import java.util.stream.Collectors;
 * */
 @Service
 public class VirusDataServiceImpl implements VirusDataService{
+
+    private static final Logger logger = Logger.getLogger(VirusDataServiceImpl.class.getName());
 
     @Autowired
     ScraperService scraperService;
@@ -94,7 +98,10 @@ public class VirusDataServiceImpl implements VirusDataService{
             String region = r.get("Province/State");
             String longitude = r.get("Long");
             String latitude = r.get("Lat");
-            int confirmedCases = Integer.parseInt(r.get(r.size() - 1));
+
+            String confirmedCasesRaw = r.get(r.size() - 1).isBlank() ? "0" : r.get(r.size() - 1);
+
+            int confirmedCases = Integer.parseInt(confirmedCasesRaw);
 
             ProvincialCase p = new ProvincialCase(country, region, longitude, latitude);
             p.setConfirmedCases(confirmedCases);
