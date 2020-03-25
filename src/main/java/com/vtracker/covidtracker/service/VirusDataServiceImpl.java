@@ -106,7 +106,7 @@ public class VirusDataServiceImpl implements VirusDataService{
             String region = r.get("Province/State");
             String longitude = r.get("Long");
             String latitude = r.get("Lat");
-            int deaths = Integer.parseInt(r.get(r.size() - 1));
+            int deaths = Integer.parseInt(!r.get(r.size() - 1).equals("") ? r.get(r.size() - 1) : "0") ;
 
             ProvincialCase p = new ProvincialCase(country, region, longitude, latitude);
             if(provincialCases.contains(p))
@@ -120,7 +120,7 @@ public class VirusDataServiceImpl implements VirusDataService{
             String region = r.get("Province/State");
             String longitude = r.get("Long");
             String latitude = r.get("Lat");
-            int recoveries = Integer.parseInt(r.get(r.size() - 1));
+            int recoveries = Integer.parseInt(!r.get(r.size() - 1).equals("") ? r.get(r.size() - 1) : "0");
 
             ProvincialCase p = new ProvincialCase(country, region, longitude, latitude);
             if(provincialCases.contains(p))
