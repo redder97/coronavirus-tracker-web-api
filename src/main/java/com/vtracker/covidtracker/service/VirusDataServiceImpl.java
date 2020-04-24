@@ -36,9 +36,9 @@ public class VirusDataServiceImpl implements VirusDataService{
     @Autowired
     ScraperService scraperService;
 
-    private static final String CONFIRMED_CASES_URL = "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Confirmed.csv";
-    private static final String DEATHS_URL =  "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Deaths.csv";
-    private static final String RECOVERIES_URL = "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Recovered.csv";
+    private static final String CONFIRMED_CASES_URL = "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv";
+    private static final String DEATHS_URL =  "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_deaths_global.csv";
+    private static final String RECOVERIES_URL = "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_recovered_global.csv";
 
     private static List<VirusGeoData> confirmedVirusData = new ArrayList<>();
     private static List<ProvincialCase> allProvincialCases = new ArrayList<>();
@@ -163,6 +163,8 @@ public class VirusDataServiceImpl implements VirusDataService{
     private void setComposedData(List<ProvincialCase> provincialCases) throws IOException {
         ComposedData composedDataGenerated = new ComposedData();
 
+        logger.info("prov " + provincialCases);
+
         List<ProvincialCase> topByDeath = provincialCases.stream()
                 .sorted(Comparator.comparingInt(ProvincialCase::getDeaths).reversed()).collect(Collectors.toList());
 
@@ -171,6 +173,8 @@ public class VirusDataServiceImpl implements VirusDataService{
 
         List<ProvincialCase> topByConfirmedCases = provincialCases.stream()
                 .sorted(Comparator.comparingInt(ProvincialCase::getConfirmedCases).reversed()).collect(Collectors.toList());
+
+        logger.info("DATA: " + topByDeath);
 
         composedDataGenerated.setTopByDeaths(topByDeath.subList(0,10));
         composedDataGenerated.setTopByConfirmedCases(topByConfirmedCases.subList(0,10));
